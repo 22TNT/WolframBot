@@ -4,42 +4,26 @@ import discord
 import shutil
 from discord.ext import commands
 from PIL import Image
+import secret
 
-
-prefix = "!wa"
-discordtoken = ""
-wolframtoken = ""
-bot = commands.bot(command_prefix=prefix)
-
-
-def normalize_equation_string(input_string):
-    input_string.replace(" ", "")
-    input_string.replace("/", "%2F")
-    input_string.replace("%", "%25")
-    input_string.replace("=", "%3D")
-    input_string.replace("+", "%2B")
-    return input_string
-
-
-def normalize_request_string(input_string):
-    input_string.replace(" ", "+")
-    input_string.replace("+", "%2B")
-    input_string.replace("%", "%25")
-    input_string.replace("?", "%3F")
-    return input_string
+prefix = "!w"
+discord_token = secret.discord_token
+wolfram_token = secret.wolfram_token
+bot = commands.Bot(command_prefix=prefix)
 
 
 def send_request_to_api(request):
-    url = "http://api.wolframalpha.com/v1/simple?appid="+wolframtoken+"&i="+request
+    url = "http://api.wolframalpha.com/v1/simple?appid=" + wolfram_token + "&i=" + request
     response = requests.get(url, stream=True)
     if response.ok:
         with open("simple.gif", "wb") as out_file:
             shutil.copyfileobj(response.raw, out_file)
-        del response
-        im = Image.open('simple.gif')
-        transparency = im.info['transparency']
-        im.save('simple.png', transparency=transparency)
+        im = Image.open('request.gif')
+        transparency = im.info.get('transparency')
+        im.save('request.png', transparency=transparency)
         del im
+        del response
         return 0
     else:
         return response.status_code
+
