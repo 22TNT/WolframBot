@@ -34,7 +34,7 @@ async def query(ctx, *request):
     request = request.replace("+", "%2B")
     if not send_request_to_api(request):
         file = discord.File("request.png", filename="request.png")
-        await ctx.send("Here's the result for \"" + request.replace("%2B", "+") + "\"", file=file)
+        await ctx.send("Here's the result for `" + request.replace("%2B", "+") + "`", file=file)
     else:
         await ctx.send("Something went wrong, try again or contact admin")
 
