@@ -2,7 +2,6 @@ import requests
 import discord
 from discord.ext import commands
 import shutil
-from PIL import Image
 import secret
 
 prefix = "="
@@ -11,6 +10,7 @@ bot.remove_command("help")
 
 
 def send_request_to_api(request, token):
+    """ Sends a GET request to WolframAlpha API and saves the file as a .gif. """
     url = "http://api.wolframalpha.com/v1/simple?appid=" + token + "&i=" + request + "&width=1000"
     response = requests.get(url, stream=True)
     if response.ok:
@@ -19,19 +19,14 @@ def send_request_to_api(request, token):
     return response.status_code
 
 
-def convert_gif_to_png(filename):
-    im = Image.open(filename + '.gif')
-    im.save(filename + '.png', transparency=im.info.get('transparency'))
-    return 0
-
-
 @bot.command()
 async def query(ctx, *request):
+    """ Reads a message from Discord that starts with =, calls send_request_to_api() and sends the .gif
+    as a .png to the Discord chat that ran the query or returns the error code. """
     request = " ".join(request[:])
     response = send_request_to_api(request.replace("+", "%2B"), secret.wolfram_token)
     if response == 200:
-        convert_gif_to_png('request')
-        file = discord.File("request.png", filename="request.png")
+        file = discord.File("request.gif", filename="request.png")
         await ctx.send("Here's the result for `" + request + "`", file=file)
     else:
         await ctx.send("Something went wrong, code = " + str(response))
@@ -39,6 +34,7 @@ async def query(ctx, *request):
 
 @bot.command()
 async def help(ctx):
+    """ A Help command. """
     e = discord.Embed(Title="Help", description="Use `=query <query>` to send a request")
     await ctx.send(embed=e)
 
