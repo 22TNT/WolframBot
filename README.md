@@ -1,2 +1,2 @@
-# WolphramBot
-A lightweight Discord bot using WolphramAlpha API
+# WolframBot
+A lightweight Discord bot using WolframAlpha API
