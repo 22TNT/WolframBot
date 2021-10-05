@@ -22,14 +22,19 @@ def send_request_to_api(request, token):
 @bot.command()
 async def query(ctx, *request):
     """ Reads a message from Discord that starts with =, calls send_request_to_api() and sends the .gif
-    as a .png to the Discord chat that ran the query or returns the error code. """
-    request = " ".join(request[:])
-    response = send_request_to_api(request.replace("+", "%2B"), secret.wolfram_token)
-    if response == 200:
-        file = discord.File("request.gif", filename="request.png")
-        await ctx.send("Here's the result for `" + request + "`", file=file)
+        as a .png to the Discord chat that ran the query or returns the error code. """
+    if request:
+        request = " ".join(request[:])
+        response = send_request_to_api(request.replace("+", "%2B"), secret.wolfram_token)
+        if response == 200:
+            file = discord.File("request.gif", filename="request.png")
+            await ctx.send("Here's the result for `" + request + "`", file=file)
+        else:
+            e = discord.Embed(Title="Error", description= "Something went wrong, code = " + str(response))
+            await ctx.send(embed=e)
     else:
-        await ctx.send("Something went wrong, code = " + str(response))
+        e = discord.Embed(Title="Error", description="No request found")
+        await ctx.send(embed=e)
 
 
 @bot.command()
@@ -37,5 +42,17 @@ async def help(ctx):
     """ A Help command. """
     e = discord.Embed(Title="Help", description="Use `=query <query>` to send a request")
     await ctx.send(embed=e)
+
+
+@bot.event
+async def on_command_error(ctx, error):
+    """ Error handling. """
+    if isinstance(error, commands.CommandNotFound):
+        e = discord.Embed(Title="Error", description="No command found, try `=help` for help")
+        await ctx.send(embed=e)
+    else:
+        e = discord.Embed(Title="Error", description="Unknown error detected")
+        await ctx.send(embed=e)
+
 
 bot.run(secret.discord_token)
